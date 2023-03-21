@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Trek Warp Speed</title>
+    <style>
+        canvas {
+            display: block;
+            background-color: black;
+        }
+        button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="space"></canvas>
+    <button id="warp">Warp Speed</button>
+    <script>
+			const canvas = document.getElementById('space');
+			const ctx = canvas.getContext('2d');
+			let stars = [];
+			let enemyShips = [];
+			let speedMultiplier = 1;
+			let score = 0;
+			
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+			
+			class Star {
+				constructor() {
+					this.x = Math.random() * canvas.width;
+					this.y = Math.random() * canvas.height;
+					this.z = Math.random() * canvas.width;
+					this.radius = 1;
+				}
+				
+				update() {
+					this.z -= speedMultiplier;
+					
+					if (this.z <= 0) {
+						this.z = canvas.width;
+						this.x = Math.random() * canvas.width;
+						this.y = Math.random() * canvas.height;
+					}
+				}
+				
+				draw() {
+					const x = (this.x - canvas.width / 2) * (canvas.width / this.z);
+					const y = (this.y - canvas.height / 2) * (canvas.width / this.z);
+					
+					const size = this.radius * (canvas.width / this.z);
+					
+					ctx.beginPath();
+					ctx.arc(x + canvas.width / 2, y + canvas.height / 2, size, 0, Math.PI * 2);
+					ctx.closePath();
+					ctx.fillStyle = 'white';
+					ctx.fill();
+				}
+			}
+			
+			class EnemyShip {
+				constructor() {
+					this.x = Math.random() * canvas.width;
+					this.y = Math.random() * canvas.height;
+					this.z = Math.random() * canvas.width;
+					this.size = 10;
+				}
+				
+				update() {
+					this.z -= speedMultiplier;
+					
+					if (this.z <= 0) {
+							this.z = canvas.width;
+							this.x = Math.random() * canvas.width;
+							this.y = Math.random() * canvas.height;
+					}
+				}
+				
+				draw() {
+					const x = (this.x - canvas.width / 2) * (canvas.width / this.z);
+					const y = (this.y - canvas.height / 2) * (canvas.width / this.z);
+					
+					const size = this.size * (canvas.width / this.z);
+					
+					ctx.beginPath();
+					ctx.moveTo(x + canvas.width / 2, y + canvas.height / 2 - size / 2);
+					ctx.lineTo(x + canvas.width / 2 + size / 2, y + canvas.height / 2 + size / 2);
+					ctx.lineTo(x + canvas.width / 2 - size / 2, y + canvas.height / 2 + size / 2);
+					ctx.closePath();
+					ctx.fillStyle = 'red';
+					ctx.fill();
+				}
+			}
+			
+			function drawScore() {
+				ctx.font = '20px Arial';
+				ctx.fillStyle = 'white';
+				ctx.fillText(`Score: ${score}`, canvas.width - 100, canvas.height - 20);
+			}
+			
+			for (let i = 0; i < 300; i++) {
+				stars.push(new Star());
+			}
+			
+			for (let i = 0; i < 10; i++) {
+				enemyShips.push(new EnemyShip());
+			}
+			
+			function animate() {
+				requestAnimationFrame(animate);
+				ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				
+				stars.forEach(star => {
+					star.update();
+					star.draw();
+				});
+				
+				enemyShips.forEach(ship => {
+					ship.update();
+					ship.draw();
+				});
+				
+				drawScore();
+			}
+			
+			animate();
+			
+			document.getElementById('warp').addEventListener('click', () => {
+				if (speedMultiplier === 1) {
+					speedMultiplier = 5;
+				}
+				else {
+					speedMultiplier = 1;
+				}
+			});
+			
+			canvas.addEventListener('click', (e) => {
+				const rect = canvas.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+				
+				enemyShips.forEach((ship, index) => {
+					const shipX = (ship.x - canvas.width / 2) * (canvas.width / ship.z) + canvas.width / 2;
+					const shipY = (ship.y - canvas.height / 2) * (canvas.width / ship.z) + canvas.height / 2;
+					const shipSize = ship.size * (canvas.width / ship.z);
+					
+					if (x >= shipX - shipSize / 2 && x <= shipX + shipSize / 2 &&
+						y >= shipY - shipSize / 2 && y <= shipY + shipSize / 2) {
+						score++;
+						ship.z = canvas.width;
+						ship.x = Math.random() * canvas.width;
+						ship.y = Math.random() * canvas.height;
+					}
+				});
+			});
+    </script>
+</body>
+</html>
