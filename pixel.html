@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pixel Art Generator</title>
+  <style>
+#canvas {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    grid-template-rows: repeat(16, 1fr);
+    width: 256px;
+    height: 256px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+}
+
+#canvas div {
+    background-color: #fff;
+    border: 1px solid #eee;
+}
+
+#color-picker {
+    text-align: center;
+    margin-top: 10px;
+}
+
+#clear-button {
+    display: block;
+    margin: 10px auto;
+}
+
+
+  </style>
+</head>
+<body>
+    <h1>Pixel Art Generator</h1>
+    <div id="color-picker">
+        <label for="color-input">Choose a color:</label>
+        <input type="color" id="color-input" value="#000000">
+    </div>
+    <div id="canvas"></div>
+    <button id="clear-button">Clear</button>
+    <script>
+const canvas = document.getElementById("canvas");
+
+for (let i = 0; i < 256; i++) {
+    const pixel = document.createElement("div");
+    pixel.addEventListener("click", function() {
+        this.style.backgroundColor = document.getElementById("color-input").value;
+    });
+    canvas.appendChild(pixel);
+}
+
+document.getElementById("clear-button").addEventListener("click", function() {
+    const pixels = canvas.querySelectorAll("div");
+    pixels.forEach(function(pixel) {
+        pixel.style.backgroundColor = "#fff";
+    });
+});
+
+  </script>
+</body>
+</html>
